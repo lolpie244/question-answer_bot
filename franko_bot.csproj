@@ -19,12 +19,6 @@
       <PackageReference Include="Telegram.Bot" Version="18.0.0" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Content Include="appsettings.example.json">
-        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      </Content>
-    </ItemGroup>
+    
 
 </Project>

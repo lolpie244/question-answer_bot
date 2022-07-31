@@ -2,8 +2,9 @@ using Microsoft.EntityFrameworkCore;
 using settings;
 using helping;
 using Telegram.Bot;
+using Bot;
 
-
+/// run ngrok: ngrok http 59890
 var builder = WebApplication.CreateBuilder(args);
 var botConfig = builder.Configuration.Get<BotConfig>();
 
@@ -29,5 +30,5 @@ app.UseEndpoints(endpoints =>
         new { controller = "BotWebhook", action = "Post" });
     endpoints.MapControllers();
 });
-
+UpdateHandlerManager.Get();
 app.Run();

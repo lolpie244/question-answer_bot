@@ -6,6 +6,7 @@ namespace db_namespace;
 public class dbContext: DbContext
 {
     public DbSet<User> Users { get; set; }
+    public DbSet<UserData> UsersData { get; set; }
 
     public dbContext(): base()
     {
