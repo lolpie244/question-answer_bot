@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using Bot;
+using BotSettings;
 
 namespace settings;
 

@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using settings;
 using helping;
 using Telegram.Bot;
-using Bot;
+using BotSettings;
 
 /// run ngrok: ngrok http 59890
 var builder = WebApplication.CreateBuilder(args);
