@@ -3,16 +3,20 @@ using settings;
 using helping;
 using Telegram.Bot;
 using BotSettings;
+using db_namespace;
 
 /// run ngrok: ngrok http 59890
 var builder = WebApplication.CreateBuilder(args);
 var botConfig = builder.Configuration.Get<BotConfig>();
+var a =builder.Configuration;
 
-builder.Services.AddDbContext<db_namespace.dbContext>(options => options.UseNpgsql(Helping.get_connection_string(builder.Configuration)));
+// builder.Services.AddDbContext<db_namespace.dbContext>(options => options.UseNpgsql(Helping.get_connection_string(builder.Configuration)));
+
 builder.Services.AddControllers().AddNewtonsoftJson();
+dbContext.ConnectionString = Helping.get_connection_string(builder.Configuration);
 
 builder.Services.AddHostedService<WebhookSetting>();
-builder.Services.AddScoped<BotService>();
+builder.Services.AddScoped<BotService>().AddScoped<dbContext>();
 builder.Services.AddHttpClient("tgwebhook")
     .AddTypedClient<ITelegramBotClient>(httpClient => new TelegramBotClient(botConfig.token, httpClient));
 

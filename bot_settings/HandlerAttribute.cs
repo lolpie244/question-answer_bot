@@ -6,26 +6,24 @@ namespace BotSettings;
 
 public abstract class HandlerAttribute: BaseCheckAttribute
 {
+    public abstract UpdateType UpdateType { get; }
     public override bool isFilter { get => false; }
-
-    public static Type[] GetHandleAttributes()
-    {
-        return AppDomain.CurrentDomain.GetAssemblies()
-            .SelectMany(assembly => assembly.GetTypes())
-            .Where(type => type.IsSubclassOf(typeof(HandlerAttribute))).ToArray();
-    }
 }
 public class CommandAttribute : HandlerAttribute
 {
     public string[] Commands { get; set; }
-
+    
+    public override UpdateType UpdateType
+    {
+        get => UpdateType.Message;
+    }
     public CommandAttribute(params string[] command)
     {
         Commands = command;
     }
     public override bool check(Update update)
     {
-        if (update.Type != UpdateType.Message || update.Message.Text == null)
+        if (update.Message.Text == null)
             return false;
 
         var message = update.Message.Text.TrimStart();
@@ -39,6 +37,10 @@ public class CommandAttribute : HandlerAttribute
 
 public class ContainsTextAttribute : HandlerAttribute
 {
+    public override UpdateType UpdateType
+    {
+        get => UpdateType.Message;
+    }
     public string[] Texts { get; set; }
     public bool AtStart { get; set; }
     public bool AtEnd { get; set; }
@@ -51,7 +53,7 @@ public class ContainsTextAttribute : HandlerAttribute
     }
     public override bool check(Update update)
     {
-        if(update.Type != UpdateType.Message || update.Message.Text == null)
+        if(update.Message.Text == null)
             return false;
         if (Texts.Length == 0)
             return true;
@@ -76,22 +78,28 @@ public class ContainsTextAttribute : HandlerAttribute
 
 public class InlineButtonCallbackAttribute : HandlerAttribute
 {
-    public string? CallbackData;
-
-    public InlineButtonCallbackAttribute(string callbackData = "")
+    public string[]? CallbackData;
+    public override UpdateType UpdateType
+    {
+        get => UpdateType.CallbackQuery;
+    }
+    public InlineButtonCallbackAttribute(params string[] callbackData)
     {
         CallbackData = callbackData;
     }
     public override bool check(Update update)
     {
-        return update.Type == UpdateType.CallbackQuery && update.CallbackQuery.Data == CallbackData;
+        return  CallbackData.Contains(update.CallbackQuery.Data);
     }
 }
 
 public class MessageAttribute : HandlerAttribute
 {
     public MessageType[] Types;
-
+    public override UpdateType UpdateType
+    {
+        get => UpdateType.Message;
+    }
     public MessageAttribute(params MessageType[] type)
     {
         Types = type;
@@ -106,5 +114,17 @@ public class MessageAttribute : HandlerAttribute
             if (type == update.Message.Type)
                 return true;
         return false;
+    }
+}
+
+public class BotStatusInGroupAttribute : HandlerAttribute
+{
+    public override UpdateType UpdateType
+    {
+        get => UpdateType.MyChatMember;
+    }
+    public override bool check(Update update)
+    {
+        return true;
     }
 }

@@ -14,10 +14,9 @@ public enum RoleEnum
 public class User
 {
     [Key, MaxLength(12)]
-    public int Id { get; set; }
+    public long Id { get; set; }
     public string? Name { get; set; }
     public RoleEnum Role { get; set; }
 
-    public int UserSettingsId { get; set; }
     public UserData? UserSettings { get; set; }
 }

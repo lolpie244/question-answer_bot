@@ -14,6 +14,7 @@
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
+      <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.0-preview.6.22329.4" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.2-beta1" />
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.0-preview.6" />
       <PackageReference Include="Telegram.Bot" Version="18.0.0" />

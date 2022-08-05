@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 
 namespace BotSettings;
 using BaseCheckDelegate = Func<ITelegramBotClient, Update, Task>;
@@ -19,57 +20,62 @@ public class UpdateHandlerManagerClass
     private Dictionary<BaseCheckAttribute, LinkedList<BaseCheckDelegate>> Handlers = new();
     private Dictionary<BaseCheckDelegate, LinkedList<BaseCheckAttribute>> Filters = new();
     private Dictionary<Type, Object?> class_instances = new();
+    private Dictionary<UpdateType, LinkedList<BaseCheckAttribute>> eventAttributes = new();
 
-    private void AddAttributeMethods(Type T, MethodInfo[] all_methods)
-    {
-        var methods = all_methods.Where(x => x.GetCustomAttributes(T, false).FirstOrDefault() != null);
-        foreach (var method in methods)
-        {
-            BaseCheckAttribute attribute = (BaseCheckAttribute)method.GetCustomAttribute(T);
-            
-            if (!class_instances.ContainsKey(method.DeclaringType))
-                class_instances[method.DeclaringType] = Activator.CreateInstance(method.DeclaringType);
-            var method_delegate = (BaseCheckDelegate)Delegate.CreateDelegate(
-                typeof(BaseCheckDelegate), class_instances[method.DeclaringType], method);
-
-            if (!attribute.isFilter)
-            {
-                if (!Handlers.ContainsKey(attribute))
-                    Handlers[attribute] = new LinkedList<BaseCheckDelegate>();
-                Handlers[attribute].AddLast(method_delegate);
-            }
-            else
-            {
-                if (!Filters.ContainsKey(method_delegate))
-                    Filters[method_delegate] = new LinkedList<BaseCheckAttribute>();
-                Filters[method_delegate].AddLast(attribute);
-            }
-        }
-    }
     public UpdateHandlerManagerClass()
     {
         var methods = AppDomain.CurrentDomain.GetAssemblies()
             .SelectMany(x => x.GetTypes())
-            .SelectMany(x => x.GetMethods()).Where(x => x.CustomAttributes.Count() != 0).ToArray();
-        
-        foreach (var attribute in HandlerAttribute.GetHandleAttributes())
-            AddAttributeMethods(attribute, methods);
+            .SelectMany(x => x.GetMethods())
+            .Where(x => x.CustomAttributes.Count() != 0 || 
+                        x.DeclaringType!.CustomAttributes.Count() != 0).ToArray();
 
-        foreach (var attribute in FilterAttribute.GetFilterAttributes())
-            AddAttributeMethods(attribute, methods);
+        foreach (var method in methods)
+        {
+            var attributes = method.GetCustomAttributes().Concat(method.DeclaringType.GetCustomAttributes());
+            foreach (var raw_attribute in attributes)
+            {
+                if (!(raw_attribute is BaseCheckAttribute attribute))
+                    continue;
+                if (!class_instances.ContainsKey(method.DeclaringType))
+                    class_instances[method.DeclaringType] = Activator.CreateInstance(method.DeclaringType);
+                var method_delegate = (BaseCheckDelegate)Delegate.CreateDelegate(
+                    typeof(BaseCheckDelegate), class_instances[method.DeclaringType], method);
+
+                if (!attribute.isFilter)
+                {
+                    if (!Handlers.ContainsKey(attribute))
+                        Handlers[attribute] = new LinkedList<BaseCheckDelegate>();
+                    Handlers[attribute].AddLast(method_delegate);
+                    if (attribute is HandlerAttribute handler)
+                    {
+                        if(!eventAttributes.ContainsKey(handler.UpdateType))
+                            eventAttributes[handler.UpdateType] = new LinkedList<BaseCheckAttribute>();
+                        eventAttributes[handler.UpdateType].AddLast(attribute);
+                    }
+                }
+                else
+                {
+                    if (!Filters.ContainsKey(method_delegate))
+                        Filters[method_delegate] = new LinkedList<BaseCheckAttribute>();
+                    Filters[method_delegate].AddLast(attribute);
+                }
+            }
+        }
     }
 
     public async Task Run(ITelegramBotClient client, Update update)
     {
         var methods = new LinkedList<Tuple<BaseCheckDelegate, int>>();
-        foreach (var attribute in Handlers.Keys)
+        if(!eventAttributes.Keys.Contains(update.Type))
+            return;
+        foreach (var attribute in eventAttributes[update.Type])
             if (attribute.check(update))
                 foreach(var method in Handlers[attribute])
                     methods.AddLast(new Tuple<BaseCheckDelegate, int>(method, attribute.Priority));
         
         int? current_priority = Int32.MaxValue;
         BaseCheckDelegate? current_method = null;
-        var blocked_methods = new HashSet<BaseCheckDelegate>();
         foreach (var method_priority in methods)
         {
             var method = method_priority.Item1;
