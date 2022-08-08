@@ -9,6 +9,7 @@ public class dbContext : DbContext
     public DbSet<User> Users { get; set; }
     public DbSet<UserData> UsersData { get; set; }
     public DbSet<Chat> Chats { get; set; }
+    public DbSet<Archive> Archive { get; set; }
     public static string ConnectionString { get; set; }
     public dbContext() : base()
     {

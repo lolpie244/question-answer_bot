@@ -14,7 +14,6 @@ public class BotService
     {
         client = botClient;
         this.logger = logger;
-        
     }
 
     public async Task GetUpdate(Update update)

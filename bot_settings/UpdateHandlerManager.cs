@@ -12,7 +12,7 @@ public abstract class BaseCheckAttribute : Attribute
     virtual public bool isFilter { get; }
     [Range(0, 1000)] public int Priority { get; set; } = 100;
 
-    public abstract bool check(Update update);
+    public abstract bool check(ITelegramBotClient client, Update update);
 }
 
 public class UpdateHandlerManagerClass
@@ -70,7 +70,7 @@ public class UpdateHandlerManagerClass
         if(!eventAttributes.Keys.Contains(update.Type))
             return;
         foreach (var attribute in eventAttributes[update.Type])
-            if (attribute.check(update))
+            if (attribute.check(client, update))
                 foreach(var method in Handlers[attribute])
                     methods.AddLast(new Tuple<BaseCheckDelegate, int>(method, attribute.Priority));
         
@@ -81,7 +81,7 @@ public class UpdateHandlerManagerClass
             var method = method_priority.Item1;
             if(Filters.ContainsKey(method))
                 foreach (var filter in Filters[method])
-                    if (!filter.check(update))
+                    if (!filter.check(client, update))
                         goto Next;
             var priority = method_priority.Item2;
             if (priority < current_priority)

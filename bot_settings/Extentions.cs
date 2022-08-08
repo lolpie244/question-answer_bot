@@ -46,6 +46,10 @@ internal static class Extensions
             { EditedMessage: { } message } => message,
             _ => throw new ArgumentException("Unsupported update type {0}.", update.Type.ToString())
         };
+    public static string FullName(this User user)
+    { 
+        return user.FirstName + (user.LastName != "" ? $" {user.LastName}" : "");
+    }
     public static string? GetStage(this Update update)
     {
         var user_id = update.GetUser().Id;

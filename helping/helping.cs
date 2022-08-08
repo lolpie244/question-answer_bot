@@ -13,11 +13,10 @@ public class Helping
     }
 }
 
-public class BotText
+public class TEXT
 {
     private static Dictionary<string, string>? Text;
-
-    public static string GetText(string name)
+    public static string Get(string name)
     {
         if (Text == null)
         {

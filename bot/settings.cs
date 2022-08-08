@@ -15,30 +15,27 @@ public class settings
     public async Task BotStatusChanged(ITelegramBotClient client, Update update)
     {
         var status = update.MyChatMember!.NewChatMember.Status;
+        
+        using (var context = new dbContext())
+        {
+            var chat = context.Chats.Find(update.GetChat().Id);
+            if (chat != null)
+                context.Chats.Remove(chat);
+            await context.SaveChangesAsync();
+        }
+        
         if (status == ChatMemberStatus.Member)
-        {
-            await client.SendTextMessageAsync(update.GetChat().Id, BotText.GetText("promote_to_admin"));
-        }
+            await client.SendTextMessageAsync(update.GetChat().Id, TEXT.Get("promote_to_admin"));
+        
 
-        if (status == ChatMemberStatus.Administrator)
-        {
-            InlineKeyboardMarkup keyboard = new(new[]
-            {
-                new[]{InlineKeyboardButton.WithCallbackData(BotText.GetText("answer_chat_button"), "answer_group")},
-                new[]{InlineKeyboardButton.WithCallbackData(BotText.GetText("archive_chat_button"), "archive_group")}
-            });
-            await client.SendTextMessageAsync(update.GetChat().Id, BotText.GetText("select_chat_type"), replyMarkup: keyboard);
-        }
-        else
-        {
-            using (var context = new dbContext())
-            {
-                var chat = context.Chats.Find(update.GetChat().Id);
-                if (chat != null)
-                    context.Chats.Remove(chat);
-                await context.SaveChangesAsync();
-            }
-        }
+        if (status == ChatMemberStatus.Administrator || status == ChatMemberStatus.Creator)
+            await ChangeGroupType(client, update);
+    }
+    [Command("/change_group_type"), Scope(ChatType.Group, ChatType.Supergroup), Role(RoleEnum.Moderator, true)]
+    public async Task ChangeGroupType(ITelegramBotClient client, Update update)
+    {
+        await client.SendTextMessageAsync(update.GetChat().Id, TEXT.Get("select_chat_type"), 
+            replyMarkup: new Keyboards(update).ChatType());
     }
 
     [InlineButtonCallback("answer_group", "archive_group")]
@@ -51,12 +48,12 @@ public class settings
 
         if (data == "answer_group")
         {
-            text = BotText.GetText("become_chat_answer");
+            text = TEXT.Get("become_chat_answer");
             chat_type = ChatEnum.Answer;
         }
         else
         {
-            text = BotText.GetText("become_chat_archive");
+            text = TEXT.Get("become_chat_archive");
             chat_type = ChatEnum.Archive;
         }
 

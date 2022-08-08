@@ -1,4 +1,5 @@
 using db_namespace;
+using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
@@ -18,7 +19,7 @@ public class ScopeAttribute : FilterAttribute
         Scopes = scopes;
     }
 
-    public override bool check(Update update)
+    public override bool check(ITelegramBotClient client, Update update)
     {
         var chat = update.GetChat();
         if(chat != null)
@@ -36,7 +37,7 @@ public class StageAttribute : FilterAttribute
         Stages = stages;
     }
 
-    public override bool check(Update update)
+    public override bool check(ITelegramBotClient client, Update update)
     {
         var stage = update.GetStage();
         return Stages.Length == 0 || Stages.Contains(stage);
@@ -45,14 +46,20 @@ public class StageAttribute : FilterAttribute
 
 public class RoleAttribute : FilterAttribute
 {
-    private db_namespace.RoleEnum[] Roles;
+    private db_namespace.RoleEnum[] Roles { get; set; }
+    private bool Higher { get; set; }
 
     public RoleAttribute(params db_namespace.RoleEnum[] roles)
     {
         Roles = roles;
     }
 
-    public override bool check(Update update)
+    public RoleAttribute(RoleEnum role, bool higher)
+    {
+        Roles = new[] { role };
+        Higher = higher;
+    }
+    public override bool check(ITelegramBotClient client, Update update)
     {
         if (Roles.Length == 0)
             return true;
@@ -66,16 +73,19 @@ public class RoleAttribute : FilterAttribute
                 return false;
             role = user.Role;
         }
+
+        if (Higher)
+            return Roles[0] <= role;
         return Roles.Contains(role);
     }
 }
 
 public class UpdateUserAttribute : FilterAttribute
 {
-    public override bool check(Update update)
+    public override bool check(ITelegramBotClient client, Update update)
     {
         var user = update.GetUser();
-        var full_name = user.FirstName + (user.LastName != "" ? $" {user.LastName}" : "");
+        var full_name = user.FullName();
         using (var context = new db_namespace.dbContext())
         {
             var user_from_db = context.Users.Find(user.Id);

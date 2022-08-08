@@ -1,3 +1,5 @@
+using System.Text.RegularExpressions;
+using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -21,15 +23,17 @@ public class CommandAttribute : HandlerAttribute
     {
         Commands = command;
     }
-    public override bool check(Update update)
+    public override bool check(ITelegramBotClient client, Update update)
     {
         if (update.Message.Text == null)
             return false;
-
+        
+        var my_name = client.GetMeAsync().Result.Username;
+        
         var message = update.Message.Text.TrimStart();
         var message_command = message.Split(' ')[0];
         foreach (var command in Commands)
-            if (message_command == command)
+            if (message_command == command || message_command == $"{command}@{my_name}")
                 return true;
         return false;
     }
@@ -51,7 +55,7 @@ public class ContainsTextAttribute : HandlerAttribute
     {
         Texts = text;
     }
-    public override bool check(Update update)
+    public override bool check(ITelegramBotClient client, Update update)
     {
         if(update.Message.Text == null)
             return false;
@@ -87,9 +91,16 @@ public class InlineButtonCallbackAttribute : HandlerAttribute
     {
         CallbackData = callbackData;
     }
-    public override bool check(Update update)
+    public override bool check(ITelegramBotClient client, Update update)
     {
-        return  CallbackData.Contains(update.CallbackQuery.Data);
+        foreach (var callback_data in CallbackData)
+        {
+            var regex = new Regex("^" + callback_data + "$");
+            if (regex.IsMatch(update.CallbackQuery.Data))
+                return true;
+        }
+
+        return false;
     }
 }
 
@@ -104,7 +115,7 @@ public class MessageAttribute : HandlerAttribute
     {
         Types = type;
     }
-    public override bool check(Update update)
+    public override bool check(ITelegramBotClient client, Update update)
     {
         if (update.Type != UpdateType.Message)
             return false;
@@ -123,7 +134,7 @@ public class BotStatusInGroupAttribute : HandlerAttribute
     {
         get => UpdateType.MyChatMember;
     }
-    public override bool check(Update update)
+    public override bool check(ITelegramBotClient client, Update update)
     {
         return true;
     }
