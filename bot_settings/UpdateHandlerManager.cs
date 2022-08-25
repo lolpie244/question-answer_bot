@@ -20,7 +20,7 @@ public class UpdateHandlerManagerClass
     private Dictionary<BaseCheckAttribute, LinkedList<BaseCheckDelegate>> Handlers = new();
     private Dictionary<BaseCheckDelegate, LinkedList<BaseCheckAttribute>> Filters = new();
     private Dictionary<Type, Object?> class_instances = new();
-    private Dictionary<UpdateType, LinkedList<BaseCheckAttribute>> eventAttributes = new();
+    private Dictionary<UpdateType, List<BaseCheckAttribute>> eventAttributes = new();
 
     public UpdateHandlerManagerClass()
     {
@@ -50,8 +50,8 @@ public class UpdateHandlerManagerClass
                     if (attribute is HandlerAttribute handler)
                     {
                         if(!eventAttributes.ContainsKey(handler.UpdateType))
-                            eventAttributes[handler.UpdateType] = new LinkedList<BaseCheckAttribute>();
-                        eventAttributes[handler.UpdateType].AddLast(attribute);
+                            eventAttributes[handler.UpdateType] = new List<BaseCheckAttribute>();
+                        eventAttributes[handler.UpdateType].Add(attribute);
                     }
                 }
                 else
@@ -62,6 +62,10 @@ public class UpdateHandlerManagerClass
                 }
             }
         }
+
+        foreach (var key in eventAttributes.Keys)
+            eventAttributes[key].Sort((a, b) => a.Priority.CompareTo(b.Priority));
+        
     }
 
     public async Task Run(ITelegramBotClient client, Update update)
@@ -74,8 +78,6 @@ public class UpdateHandlerManagerClass
                 foreach(var method in Handlers[attribute])
                     methods.AddLast(new Tuple<BaseCheckDelegate, int>(method, attribute.Priority));
         
-        int? current_priority = Int32.MaxValue;
-        BaseCheckDelegate? current_method = null;
         foreach (var method_priority in methods)
         {
             var method = method_priority.Item1;
@@ -83,18 +85,11 @@ public class UpdateHandlerManagerClass
                 foreach (var filter in Filters[method])
                     if (!filter.check(client, update))
                         goto Next;
-            var priority = method_priority.Item2;
-            if (priority < current_priority)
-            {
-                current_priority = priority;
-                current_method = method;
-            }
+            await method(client, update);
+            break;
             Next:
             continue;
         }
-
-        if (current_method != null)
-            await current_method(client, update);
     }
 }
 
