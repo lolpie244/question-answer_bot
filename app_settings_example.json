@@ -2,6 +2,7 @@
   "Logging": {
     "LogLevel": {
       "Default": "Information",
+      "System.Net.Http.HttpClient": "Error",
       "Microsoft.AspNetCore": "Warning"
     }
   },

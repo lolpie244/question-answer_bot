@@ -19,19 +19,19 @@ public class question_answer
 
         db_namespace.Chat[] chats = context.Chats.Where(obj => obj.Type == ChatEnum.Answer).ToArray();
 
-        var message = update.Message;
-        var asker_id = message.From.Id;
+        var message = update.Message!;
+        var asker_id = message.From!.Id;
         foreach (var chat in chats)
         {
             int new_message_id = (await client.CopyMessageAsync(chat.Id, message.Chat.Id, 
                 message.MessageId, replyMarkup: new Keyboards(update).Ask())).Id;
-            context.Archive.Add(new Archive(new_message_id, chat.Id, asker_id)
+            context.Archive.Add(new Archive
             {
-                RelatedUserId = asker_id, Type = MessageType.QA
+                MessageId = new_message_id, ChatId = chat.Id, UserId = asker_id, RelatedUserId = asker_id
             });
         }
 
-        context.SaveChanges();
+        await context.SaveChangesAsync();
     }
 
     private async Task<bool> AnswerQuestion(ITelegramBotClient client, Update update)
@@ -46,10 +46,7 @@ public class question_answer
         if (question == null || question.RelatedUserId == null)
             return false;
         
-        context.Archive.Add(new Archive(message)
-        {
-            RelatedUserId = question.RelatedUserId, Type = MessageType.QA
-        });
+        context.Archive.Add(new Archive(message, MessageType.QA,  question.RelatedUserId));
         await context.SaveChangesAsync();
         await client.CopyMessageAsync(question.RelatedUserId, message.Chat.Id, message.MessageId);
         return true;

@@ -5,7 +5,8 @@ namespace db_namespace;
 public enum ChatEnum
 {
     Answer = 0,
-    Archive = 1
+    Archive = 1,
+    Report = 2
 }
 
 public class Chat

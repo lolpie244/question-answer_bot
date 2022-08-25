@@ -4,6 +4,7 @@ using helping;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 using MessageType = db_namespace.MessageType;
 
 namespace Bot;
@@ -11,31 +12,31 @@ namespace Bot;
 [Scope(ChatType.Private)]
 public class Report
 {
-    [InlineButtonCallback("report")]
+    [InlineButtonCallback("report"), Command("/report")]
     public async Task WriteReport(ITelegramBotClient client, Update update)
     {
         update.SetStage("report");
+        Console.WriteLine(update.GetStage());
         await client.SendTextMessageAsync(update.GetChat().Id, TEXT.Get("write_report"), replyMarkup:
             new Keyboards().ReplyEnd());
     }
     [Text("Завершити"), Stage("report"), UpdateUser]
-    public async Task EndReport(TelegramBotClient client, Update update)
+    public async Task EndReport(ITelegramBotClient client, Update update)
     {
         var user_id = update.GetUser()!.Id;
         update.SetStage(null);
-
-        await client.SendTextMessageAsync(user_id, TEXT.Get("report_thx"));
+        await client.SendTextMessageAsync(user_id, TEXT.Get("report_thx"), replyMarkup:new ReplyKeyboardRemove());
 
         var context = new dbContext();
-        var superuser = context.Users.Where(obj => obj.Role == RoleEnum.SuperAdmin);
+        var chats = context.Chats.Where(obj => obj.Type == ChatEnum.Report).ToArray();
         
-        var messages = context.Archive.Where(obj => obj.Type == MessageType.Report && obj.UserId == user_id);
+        var messages = context.Archive.Where(obj => obj.Type == MessageType.Report && obj.UserId == user_id).ToArray();
         var keyboard = new Keyboards(update).Reporter(user_id);
-        foreach (var user in superuser)
+        foreach (var chat in chats)
         {
-            await client.SendTextMessageAsync(user.Id, TEXT.Get("new_report_created"), replyMarkup: keyboard);
+            await client.SendTextMessageAsync(chat.Id, TEXT.Get("new_report_created"), replyMarkup: keyboard);
             foreach (var message in messages)
-                await client.CopyMessageAsync(user_id, message.ChatId, message.MessageId);
+                await client.CopyMessageAsync(chat.Id, message.ChatId, message.MessageId);
         }
         context.RemoveRange(messages);
         await context.SaveChangesAsync();

@@ -10,12 +10,15 @@ public enum MessageType
 }
 public class Archive
 {
-    public Archive(int messageId, long chatId, long userId) {}
-    public Archive(Message message)
+    public Archive() { }
+
+    public Archive(Message message, MessageType type=MessageType.QA, long? relatedUserId=null)
     {
         MessageId = message.MessageId;
         ChatId = message.Chat.Id;
         UserId = message.From!.Id;
+        Type = type;
+        RelatedUserId = relatedUserId;
     }
     [Key]
     public int Id { get; set; }

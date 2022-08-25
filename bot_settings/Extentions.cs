@@ -74,10 +74,9 @@ internal static class Extensions
             if (stage == null)
                 context.Stages.Add(new StageModel { user_id = user_id, StageName = stage_name });
             else
-            {
                 stage.StageName = stage_name;
-                context.SaveChanges();
-            }
+            context.SaveChanges();
+
         }
     }
 }

@@ -22,7 +22,7 @@ public class moderator
         if(asker == null)
             return;
         
-        var messages = context.Archive.Where(obj => obj.Type == MessageType.QA && obj.RelatedUserId == asker);
+        var messages = context.Archive.Where(obj => obj.Type == MessageType.QA && obj.RelatedUserId == asker).ToArray();
 
         var keyboard = new Keyboards();
         string closed_at = DateTime.Now.ToString();

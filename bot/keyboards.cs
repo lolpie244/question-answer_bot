@@ -22,7 +22,8 @@ public class Keyboards
         return new(new[]
         {
             new[]{InlineKeyboardButton.WithCallbackData(TEXT.Get("answer_chat_button"), "answer_group")},
-            new[]{InlineKeyboardButton.WithCallbackData(TEXT.Get("archive_chat_button"), "archive_group")}
+            new[]{InlineKeyboardButton.WithCallbackData(TEXT.Get("archive_chat_button"), "archive_group")},
+            new[]{InlineKeyboardButton.WithCallbackData(TEXT.Get("report_chat_button"), "report_group")}
         });
     }
 
@@ -44,8 +45,7 @@ public class Keyboards
         return new(new[]
         {
             new[]{InlineKeyboardButton.WithUrl(string.Format(TEXT.Get("user_that_report_button"), username), 
-                $"tg://user?id={user_id}")},
-            new[]{InlineKeyboardButton.WithCallbackData(TEXT.Get("close_report_button"), "close_report")},
+                $"tg://user?id={user_id}")}
         });
     }
 
@@ -53,6 +53,7 @@ public class Keyboards
     {
         var context = new dbContext();
         var user = context.Users.Find(message.UserId);
+        Console.WriteLine(message.UserId);
         if(message.IsQuestion)
             return new(new[]
             {

@@ -3,6 +3,7 @@
     "select_chat_type": "Якого типу цей чат",
     "become_chat_answer": "У цей чат будуть приходити запитання, на які потрібно відповідати",
     "become_chat_archive": "У цьому чаті будуть зберігатись закриті запитання",
+    "become_chat_report": "У чей чат будуть приходити репорти користувачів",
     "report_closed": "Цей репорт закрито",
     "question_removed": "Це повідомлення вже видалене",
     
@@ -11,6 +12,7 @@
 
     "answer_chat_button": "Чат для відповіді на запитання",
     "archive_chat_button": "Чат-архів",
+    "report_chat_button": "Чат для репортів",
     "user_that_ask_button": "Спитав {0}",
     "user_that_ans_button": "Відповів {0}",
     "user_that_report_button": "Повідомив {0}",

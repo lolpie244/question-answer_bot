@@ -15,15 +15,16 @@ public abstract class BaseCheckAttribute : Attribute
     public abstract bool check(ITelegramBotClient client, Update update);
 }
 
-public class UpdateHandlerManagerClass
+public class UpdateHandlerManager
 {
     private Dictionary<BaseCheckAttribute, LinkedList<BaseCheckDelegate>> Handlers = new();
     private Dictionary<BaseCheckDelegate, LinkedList<BaseCheckAttribute>> Filters = new();
     private Dictionary<Type, Object?> class_instances = new();
     private Dictionary<UpdateType, List<BaseCheckAttribute>> eventAttributes = new();
-
-    public UpdateHandlerManagerClass()
+    public ILogger<UpdateHandlerManager> logger { get; set; }
+    public UpdateHandlerManager(ILogger<UpdateHandlerManager> logger)
     {
+        this.logger = logger;
         var methods = AppDomain.CurrentDomain.GetAssemblies()
             .SelectMany(x => x.GetTypes())
             .SelectMany(x => x.GetMethods())
@@ -39,9 +40,16 @@ public class UpdateHandlerManagerClass
                     continue;
                 if (!class_instances.ContainsKey(method.DeclaringType))
                     class_instances[method.DeclaringType] = Activator.CreateInstance(method.DeclaringType);
-                var method_delegate = (BaseCheckDelegate)Delegate.CreateDelegate(
-                    typeof(BaseCheckDelegate), class_instances[method.DeclaringType], method);
-
+                BaseCheckDelegate method_delegate;
+                try
+                {
+                    method_delegate = (BaseCheckDelegate)Delegate.CreateDelegate(
+                        typeof(BaseCheckDelegate), class_instances[method.DeclaringType], method);
+                }
+                catch
+                {
+                    throw new Exception($"Method \"{method}\" has wrong signature");
+                }
                 if (!attribute.isFilter)
                 {
                     if (!Handlers.ContainsKey(attribute))
@@ -85,25 +93,18 @@ public class UpdateHandlerManagerClass
                 foreach (var filter in Filters[method])
                     if (!filter.check(client, update))
                         goto Next;
-            await method(client, update);
-            break;
+            Console.WriteLine($"Run method {method.Method.Name}");
+            try
+            {
+                await method(client, update);
+            }
+            catch (Exception error)
+            {
+                logger.LogError(exception: error, message: $"There is error while processing {method.Method.Name}");
+            }
+            return;
             Next:
             continue;
         }
     }
 }
-
-class UpdateHandlerManager
-{
-    private static UpdateHandlerManagerClass? instance;
-
-    public static UpdateHandlerManagerClass Get()
-    {
-        if (instance == null)
-            instance = new UpdateHandlerManagerClass();
-        return instance;
-    }
-}
-
-
-
