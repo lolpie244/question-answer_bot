@@ -28,7 +28,7 @@ public class Keyboards
 
     public InlineKeyboardMarkup Ask()
     {
-        var user = update.GetUser();
+        var user = update!.GetUser();
         return new(new[]
         {
             new []{InlineKeyboardButton.WithUrl(string.Format(TEXT.Get("user_that_ask_button"), user.FullName()), 
@@ -39,7 +39,7 @@ public class Keyboards
 
     public InlineKeyboardMarkup Reporter(long user_id)
     {
-        var context = new db_namespace.dbContext();
+        var context = new dbContext();
         var username = context.Users.Find(user_id).Name;
         return new(new[]
         {
@@ -65,5 +65,10 @@ public class Keyboards
                 new[]{InlineKeyboardButton.WithUrl(string.Format(TEXT.Get("user_that_ans_button"), user.Name), 
                     $"tg://user?id={user.Id}")}
             });
+    }
+
+    public ReplyKeyboardMarkup ReplyEnd()
+    {
+        return new(new[] { new KeyboardButton(TEXT.Get("end_button")) }){ResizeKeyboard = true};
     }
 }

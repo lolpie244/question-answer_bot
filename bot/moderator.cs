@@ -12,17 +12,21 @@ namespace Bot;
 public class moderator
 {
     [InlineButtonCallback("close_question")]
-    public async Task Report(ITelegramBotClient client, Update update)
+    public async Task CloseQuestion(ITelegramBotClient client, Update update)
     {
         var context = new db_namespace.dbContext();
         var chats = context.Chats.Where(obj => obj.Type == ChatEnum.Archive).ToArray();
 
-        var asker = context.Archive.First(obj => obj.MessageId == update.GetMessage().MessageId
-                                                 && obj.ChatId == update.GetChat().Id).AskerId;
-        var messages = context.Archive.Where(obj => obj.AskerId == asker);
-        // Console.WriteLine($"{chats.Length}, {messages.Length}");
+        var asker = context.Archive.First(obj => obj.MessageId == update.GetMessage()!.MessageId
+                                                 && obj.ChatId == update.GetChat()!.Id).RelatedUserId;
+        if(asker == null)
+            return;
+        
+        var messages = context.Archive.Where(obj => obj.Type == MessageType.QA && obj.RelatedUserId == asker);
+
         var keyboard = new Keyboards();
         string closed_at = DateTime.Now.ToString();
+        
         foreach (var chat in chats)
         {
             await client.SendTextMessageAsync(chat.Id, 

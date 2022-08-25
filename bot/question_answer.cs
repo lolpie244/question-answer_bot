@@ -5,6 +5,7 @@ using helping;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using MessageType = db_namespace.MessageType;
 
 namespace Bot;
 
@@ -14,9 +15,9 @@ public class question_answer
     [Message(Priority = 1000), Scope(ChatType.Private)]
     public async Task Ask(ITelegramBotClient client, Update update)
     {
-        db_namespace.Chat[] chats;
         var context = new dbContext();
-        chats = context.Chats.Where(obj => obj.Type == ChatEnum.Answer).ToArray();
+
+        db_namespace.Chat[] chats = context.Chats.Where(obj => obj.Type == ChatEnum.Answer).ToArray();
 
         var message = update.Message;
         var asker_id = message.From.Id;
@@ -24,9 +25,9 @@ public class question_answer
         {
             int new_message_id = (await client.CopyMessageAsync(chat.Id, message.Chat.Id, 
                 message.MessageId, replyMarkup: new Keyboards(update).Ask())).Id;
-            context.Archive.Add(new Archive
+            context.Archive.Add(new Archive(new_message_id, chat.Id, asker_id)
             {
-                AskerId = asker_id, ChatId = chat.Id, MessageId = new_message_id, UserId = asker_id, IsQuestion = true
+                RelatedUserId = asker_id, Type = MessageType.QA
             });
         }
 
@@ -36,22 +37,21 @@ public class question_answer
     private async Task<bool> AnswerQuestion(ITelegramBotClient client, Update update)
     {
         var message = update.Message;
-        var message_that_replied = message.ReplyToMessage;
-        if(message_that_replied == null || message_that_replied.From.Id != client.GetMeAsync().Result.Id)
+        var message_that_replied = message!.ReplyToMessage;
+        if(message_that_replied == null || message_that_replied.From!.Id != client.GetMeAsync().Result.Id)
             return false;
         var context = new dbContext();
         var question =
-            context.Archive.FirstOrDefault(obj => obj.IsQuestion == true && obj.MessageId == message_that_replied.MessageId);
-        if (question == null)
+            context.Archive.FirstOrDefault(obj => obj.Type == MessageType.QA && obj.MessageId == message_that_replied.MessageId);
+        if (question == null || question.RelatedUserId == null)
             return false;
         
-        context.Archive.Add(new Archive
+        context.Archive.Add(new Archive(message)
         {
-            AskerId = question.AskerId, ChatId = message.Chat.Id, MessageId = message.MessageId, 
-            UserId = message.From.Id, IsQuestion = false
+            RelatedUserId = question.RelatedUserId, Type = MessageType.QA
         });
         await context.SaveChangesAsync();
-        await client.CopyMessageAsync(question.AskerId, message.Chat.Id, message.MessageId);
+        await client.CopyMessageAsync(question.RelatedUserId, message.Chat.Id, message.MessageId);
         return true;
     }
     [Message(Priority = 1000), Role(RoleEnum.Moderator, true)]

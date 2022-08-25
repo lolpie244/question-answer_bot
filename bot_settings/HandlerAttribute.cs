@@ -39,19 +39,15 @@ public class CommandAttribute : HandlerAttribute
     }
 }
 
-public class ContainsTextAttribute : HandlerAttribute
+public class TextAttribute : HandlerAttribute
 {
     public override UpdateType UpdateType
     {
         get => UpdateType.Message;
     }
     public string[] Texts { get; set; }
-    public bool AtStart { get; set; }
-    public bool AtEnd { get; set; }
-    public bool CaseInsensetive { get; set; }
-    public bool Trim { get; set; }
 
-    public ContainsTextAttribute(params string[] text)
+    public TextAttribute(params string[] text)
     {
         Texts = text;
     }
@@ -61,20 +57,13 @@ public class ContainsTextAttribute : HandlerAttribute
             return false;
         if (Texts.Length == 0)
             return true;
-        
-        var messageText = update.Message.Text;
-        if (this.CaseInsensetive)
-            messageText = messageText.ToLower();
-        if (this.Trim)
-            messageText = messageText.Trim();
-
-        foreach (var text in Texts)
+        foreach (var some_text in Texts)
         {
-            if (AtStart && messageText.StartsWith(text) ||
-                AtEnd && messageText.EndsWith(text) ||
-                !AtStart && !AtEnd && messageText.Contains(text))
+            var regex = new Regex("^" + some_text + "$");
+            if (regex.IsMatch(update.Message.Text))
                 return true;
         }
+
         return false;
     }
 

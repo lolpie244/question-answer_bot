@@ -65,7 +65,7 @@ internal static class Extensions
         return result;
     }
 
-    public static void SetStage(this Update update, string stage_name)
+    public static void SetStage(this Update update, string? stage_name)
     {
         var user_id = update.GetUser().Id;
         using (var context = new InMemoryContext())
