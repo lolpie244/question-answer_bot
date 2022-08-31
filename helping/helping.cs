@@ -11,6 +11,21 @@ public class Helping
         return $"Host={db_data.host};Port={db_data.port};Database={db_data.database};" +
                                  $"Username={db_data.user};Password={db_data.password}";
     }
+    public static Dictionary<string, string> get_data_from_string(string input, char seperator=';')
+    {
+        var result = new Dictionary<string, string>();
+
+        input = input.Remove(0, input.IndexOf(":") + 1);
+        var data = input.Split(seperator);
+        foreach (var key_value in data)
+        {
+            int id_of_seperator = key_value.IndexOf('=');
+            var key = key_value.Substring(0, id_of_seperator);
+            var value = key_value.Substring(id_of_seperator + 1, key_value.Length - id_of_seperator - 1);
+            result[key] = value;
+        }
+        return result;
+    }
 }
 
 public class TEXT

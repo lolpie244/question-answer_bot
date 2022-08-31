@@ -12,7 +12,7 @@ namespace Bot;
 public class question_answer
 {
     
-    [Message(Priority = 1000), Scope(ChatType.Private)]
+    [Message(Priority = 1000), Scope(ChatType.Private), Role(RoleEnum.User, true)]
     public async Task Ask(ITelegramBotClient client, Update update)
     {
         var context = new dbContext();
@@ -63,5 +63,10 @@ public class question_answer
         if (!await AnswerQuestion(client, update))
             await Ask(client, update);
     }
-    
+
+    [Message(Priority = 1000), Role(RoleEnum.Banned)]
+    public async Task BannedTryAsk(ITelegramBotClient client, Update update)
+    {
+        await client.SendTextMessageAsync(update.GetChat().Id, TEXT.Get("banned_cant_ask"));
+    }
 }

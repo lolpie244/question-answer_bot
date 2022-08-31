@@ -11,7 +11,6 @@ public class super_admin
     [InlineButtonCallback("close_report")]
     public async Task CloseReport(ITelegramBotClient client, Update update)
     {
-        Console.WriteLine("KEEEEEEEEEEEEEEEEEK");
         await client.DeleteMessageAsync(update.GetChat().Id, update.GetMessage().MessageId);
     }
 }

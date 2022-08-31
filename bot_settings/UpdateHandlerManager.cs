@@ -48,7 +48,8 @@ public class UpdateHandlerManager
                 }
                 catch
                 {
-                    throw new Exception($"Method \"{method}\" has wrong signature");
+                    logger.LogInformation($"Method \"{method}\" has wrong signature");
+                    continue;
                 }
                 if (!attribute.isFilter)
                 {
