@@ -17,7 +17,13 @@ public class admin
         var context = new dbContext();
         var user_id = long.Parse(helping.Helping.get_data_from_string(update.CallbackQuery.Data)["user_id"]);
         var user = context.Users.Find(user_id);
-        
+        var current_user = context.Users.Find(update.GetUser().Id);
+        if (user.Role >= current_user.Role)
+        {
+            await client.AnswerCallbackQueryAsync(update.CallbackQuery.Id, TEXT.Get("no_permissions"));
+            return;
+        }
+
         var ban = user.Role != RoleEnum.Banned;
         if (ban)
             user.Role = RoleEnum.Banned;
@@ -31,11 +37,5 @@ public class admin
         await client.EditMessageReplyMarkupAsync(original_message.Chat.Id, original_message.MessageId, keyboard);
         await client.AnswerCallbackQueryAsync(update.CallbackQuery.Id, string.Format(TEXT.Get($"{ban_str}_text"), user.Name));
         await client.SendTextMessageAsync(user.Id, TEXT.Get($"{ban_str}_to_user_text"));
-    }
-    [Command("/ban")]
-    public async Task BanUserCommand(ITelegramBotClient client, Update update)
-    {
-        
-            
     }
 }

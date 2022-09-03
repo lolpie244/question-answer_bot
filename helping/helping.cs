@@ -1,5 +1,7 @@
 using System.Text.Json;
+using db_namespace;
 using settings;
+using Telegram.Bot.Types;
 
 namespace helping;
 
@@ -25,6 +27,20 @@ public class Helping
             result[key] = value;
         }
         return result;
+    }
+
+    public static db_namespace.User? get_user_from_message(Message message, dbContext? context = null)
+    {
+        if(context == null)
+            context = new dbContext();
+        db_namespace.User user;
+        if (!message.From.IsBot)
+            return context.Users.Find(message.From.Id);
+        var db_message = context.Archive.First(obj => obj.MessageId == message.MessageId &&
+                                                   obj.ChatId == message.Chat.Id);
+        if(db_message != null)
+            return context.Users.Find(db_message.UserId);
+        return null;
     }
 }
 

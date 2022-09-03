@@ -1,4 +1,5 @@
 using BotSettings;
+using db_namespace;
 using helping;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -6,11 +7,14 @@ using Telegram.Bot.Types.Enums;
 
 namespace Bot;
 
+[Role(RoleEnum.SuperAdmin)]
 public class super_admin
 {
-    [InlineButtonCallback("close_report")]
-    public async Task CloseReport(ITelegramBotClient client, Update update)
+    
+
+    [Command("/remove_admin")]
+    public async Task PromoteFromAdmin(ITelegramBotClient client, Update update)
     {
-        await client.DeleteMessageAsync(update.GetChat().Id, update.GetMessage().MessageId);
+        
     }
 }

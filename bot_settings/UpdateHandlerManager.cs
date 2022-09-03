@@ -21,10 +21,9 @@ public class UpdateHandlerManager
     private Dictionary<BaseCheckDelegate, LinkedList<BaseCheckAttribute>> Filters = new();
     private Dictionary<Type, Object?> class_instances = new();
     private Dictionary<UpdateType, List<BaseCheckAttribute>> eventAttributes = new();
-    public ILogger<UpdateHandlerManager> logger { get; set; }
-    public UpdateHandlerManager(ILogger<UpdateHandlerManager> logger)
+    public UpdateHandlerManager()
     {
-        this.logger = logger;
+        Console.WriteLine("Start sync attributes");
         var methods = AppDomain.CurrentDomain.GetAssemblies()
             .SelectMany(x => x.GetTypes())
             .SelectMany(x => x.GetMethods())
@@ -48,7 +47,7 @@ public class UpdateHandlerManager
                 }
                 catch
                 {
-                    logger.LogInformation($"Method \"{method}\" has wrong signature");
+                    Console.WriteLine($"Method \"{method}\" has wrong signature");
                     continue;
                 }
                 if (!attribute.isFilter)
@@ -74,7 +73,7 @@ public class UpdateHandlerManager
 
         foreach (var key in eventAttributes.Keys)
             eventAttributes[key].Sort((a, b) => a.Priority.CompareTo(b.Priority));
-        
+        Console.WriteLine("Finish sync attributes");
     }
 
     public async Task Run(ITelegramBotClient client, Update update)
@@ -101,7 +100,10 @@ public class UpdateHandlerManager
             }
             catch (Exception error)
             {
-                logger.LogError(exception: error, message: $"There is error while processing {method.Method.Name}");
+                Console.WriteLine($"There is error while processing {method.Method.Name}");
+                Console.WriteLine(error);
+                // Console
+                // (exception: error, message: $"There is error while processing {method.Method.Name}");
             }
             return;
             Next:

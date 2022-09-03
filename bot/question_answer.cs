@@ -64,7 +64,7 @@ public class question_answer
             await Ask(client, update);
     }
 
-    [Message(Priority = 1000), Role(RoleEnum.Banned)]
+    [Message(Priority = 1000), Role(RoleEnum.Banned), Scope(ChatType.Private)]
     public async Task BannedTryAsk(ITelegramBotClient client, Update update)
     {
         await client.SendTextMessageAsync(update.GetChat().Id, TEXT.Get("banned_cant_ask"));

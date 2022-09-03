@@ -39,8 +39,17 @@ public class moderator
             await client.SendTextMessageAsync(chat.Id, 
                 String.Format(TEXT.Get("new_conversation_in_archive"), closed_at));
             foreach (var message in messages)
-                await client.CopyMessageAsync(chat.Id, message.ChatId, message.MessageId,
-                    replyMarkup: keyboard.History(message, asker));
+                try
+                {
+                    await client.CopyMessageAsync(chat.Id, message.ChatId, message.MessageId,
+                        replyMarkup: keyboard.History(message, asker));
+                }
+                catch (Exception e)
+                {
+                    await client.SendTextMessageAsync(chat.Id, TEXT.Get("deleted_message"),
+                        replyMarkup: keyboard.History(message, asker));
+                }
+                
         }
 
         foreach (var message in messages)
@@ -61,19 +70,19 @@ public class moderator
         await client.AnswerCallbackQueryAsync(update.CallbackQuery.Id, Strings.Format(TEXT.Get("question_closed"), asker.Name));
     }
 
-    [InlineButtonCallback("ban_request")]
+    [InlineButtonCallback("ban_request:user_id=.*")]
     public async Task BanRequest(ITelegramBotClient client, Update update)
     {
         var context = new dbContext();
         var original_message = update.GetMessage();
-        var user_id = get_related_user_id_for_message(update.GetMessage()!);
+        var user_id = long.Parse(Helping.get_data_from_string(update.CallbackQuery.Data)["user_id"]);
         var user = context.Users.Find(user_id);
         if (user.Role == RoleEnum.Banned)
         {
-            await client.AnswerCallbackQueryAsync(update.CallbackQuery.Id, String.Format(TEXT.Get("user_already_banned")));
+            await client.AnswerCallbackQueryAsync(update.CallbackQuery.Id, TEXT.Get("user_already_banned"));
             return;
         }
-        await client.AnswerCallbackQueryAsync(update.CallbackQuery.Id, String.Format(TEXT.Get("ban_request_sent")));
+        await client.AnswerCallbackQueryAsync(update.CallbackQuery.Id, TEXT.Get("ban_request_sent"));
         
         var chats = context.Chats.Where(obj => obj.Type == ChatEnum.Report).ToArray();
         var keyboard = new Keyboards(update).Ban(user, true);

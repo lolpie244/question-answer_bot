@@ -35,7 +35,8 @@ public class Keyboards
             new []{InlineKeyboardButton.WithUrl(string.Format(TEXT.Get("user_that_ask_button"), user.FullName()), 
                 $"tg://user?id={user.Id}")},
             new []{InlineKeyboardButton.WithCallbackData(TEXT.Get("close_question_button"), "close_question") },
-            new []{InlineKeyboardButton.WithCallbackData(TEXT.Get("ban_request_button"), "ban_request") }
+            new []{InlineKeyboardButton.WithCallbackData(TEXT.Get("ban_request_button"), 
+                $"ban_request:user_id={user.Id}") }
         });
     }
 
@@ -64,12 +65,16 @@ public class Keyboards
             {
                 new[]{InlineKeyboardButton.WithUrl(string.Format(TEXT.Get("user_that_ask_button"), user.Name), 
                     $"tg://user?id={user.Id}")},
+                new []{InlineKeyboardButton.WithCallbackData(TEXT.Get("ban_request_button"), 
+                    $"ban_request:user_id={user.Id}")}
             });
         else
             return new(new[]
             {
                 new[]{InlineKeyboardButton.WithUrl(string.Format(TEXT.Get("user_that_ans_button"), user.Name), 
                     $"tg://user?id={user.Id}")},
+                new []{InlineKeyboardButton.WithCallbackData(TEXT.Get("ban_request_button"), 
+                    $"ban_request:user_id={user.Id}") }
             });
     }
 
