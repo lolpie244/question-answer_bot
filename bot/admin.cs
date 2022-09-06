@@ -9,7 +9,7 @@ using helping;
 namespace Bot;
 
 [Role(RoleEnum.Admin, true)]
-public class admin
+public class admin: IBotController
 {
     [InlineButtonCallback("ban:user_id=.*", "unban:user_id=.*")]
     public async Task BanUserButton(ITelegramBotClient client, Update update)

@@ -9,7 +9,7 @@ using Chat = Telegram.Bot.Types.Chat;
 
 namespace Bot;
 
-public class settings
+public class settings: IBotController
 {
     [BotStatusInGroup]
     public async Task BotStatusChanged(ITelegramBotClient client, Update update)

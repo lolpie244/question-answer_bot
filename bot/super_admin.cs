@@ -8,7 +8,7 @@ using Telegram.Bot.Types.Enums;
 namespace Bot;
 
 [Role(RoleEnum.SuperAdmin)]
-public class super_admin
+public class super_admin: IBotController
 {
     
 

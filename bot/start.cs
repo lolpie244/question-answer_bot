@@ -7,7 +7,7 @@ using Telegram.Bot.Types.Enums;
 namespace Bot;
 
 [Command("/start", "/help")]
-public class start_and_help
+public class start_and_help: IBotController
 {
     [Scope(ChatType.Private), UpdateUser]
     public async Task User(ITelegramBotClient client, Update update)

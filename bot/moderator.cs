@@ -10,7 +10,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 namespace Bot;
 
 [Role(RoleEnum.Moderator, true)]
-public class moderator
+public class moderator: IBotController
 {
     public long? get_related_user_id_for_message(Message message)
     {

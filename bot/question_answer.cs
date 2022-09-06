@@ -9,7 +9,7 @@ using MessageType = db_namespace.MessageType;
 
 namespace Bot;
 
-public class question_answer
+public class question_answer: IBotController
 {
     
     [Message(Priority = 1000), Scope(ChatType.Private), Role(RoleEnum.User, true)]

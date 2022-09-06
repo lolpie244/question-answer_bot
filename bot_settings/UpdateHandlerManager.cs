@@ -15,6 +15,10 @@ public abstract class BaseCheckAttribute : Attribute
     public abstract bool check(ITelegramBotClient client, Update update);
 }
 
+public interface IBotController
+{
+    
+}
 public class UpdateHandlerManager
 {
     private Dictionary<BaseCheckAttribute, LinkedList<BaseCheckDelegate>> Handlers = new();

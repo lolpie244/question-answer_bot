@@ -1,6 +1,8 @@
+using BotSettings;
+
 namespace Bot;
 
-public class user
+public class user: IBotController
 {
     
 }

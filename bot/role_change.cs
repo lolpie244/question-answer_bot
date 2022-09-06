@@ -6,7 +6,7 @@ using Telegram.Bot.Types;
 
 namespace Bot;
 
-public class role_change
+public class role_change: IBotController
 {
     public db_namespace.User? change_role(Update update, RoleEnum role)
     {

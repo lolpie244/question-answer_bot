@@ -10,13 +10,12 @@ using MessageType = db_namespace.MessageType;
 namespace Bot;
 
 [Scope(ChatType.Private)]
-public class Report
+public class Report: IBotController
 {
     [InlineButtonCallback("report"), Command("/report")]
     public async Task WriteReport(ITelegramBotClient client, Update update)
     {
         update.SetStage("report");
-        Console.WriteLine(update.GetStage());
         await client.SendTextMessageAsync(update.GetChat().Id, TEXT.Get("write_report"), replyMarkup:
             new Keyboards().ReplyEnd());
     }

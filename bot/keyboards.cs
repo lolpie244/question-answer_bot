@@ -27,6 +27,7 @@ public class Keyboards
         });
     }
 
+    
     public InlineKeyboardMarkup Ask()
     {
         var user = update!.GetUser();
@@ -59,7 +60,6 @@ public class Keyboards
             user = context.Users.Find(message.UserId);
         }
 
-        Console.WriteLine(message.UserId);
         if(message.IsQuestion)
             return new(new[]
             {
