@@ -22,13 +22,13 @@ public class moderator: IBotController
     [InlineButtonCallback("close_question")]
     public async Task CloseQuestion(ITelegramBotClient client, Update update)
     {
-        var context = new db_namespace.dbContext();
+        var context = new dbContext();
         var chats = context.Chats.Where(obj => obj.Type == ChatEnum.Archive).ToArray();
 
         var asker_id = get_related_user_id_for_message(update.GetMessage()!);
         if(asker_id == null)
             return;
-        var asker = context.Users.Find(asker_id);
+        var asker = await context.Users.FindAsync(asker_id);
         var messages = context.Archive.Where(obj => obj.Type == MessageType.QA && obj.RelatedUserId == asker_id).ToArray();
 
         var keyboard = new Keyboards();
@@ -60,8 +60,12 @@ public class moderator: IBotController
             }
             catch
             {
-                if (message.IsQuestion)
-                    await client.EditMessageTextAsync(message.ChatId, message.MessageId, TEXT.Get("question_removed"));
+                try
+                {
+                    if (message.IsQuestion)
+                        await client.EditMessageTextAsync(message.ChatId, message.MessageId, TEXT.Get("question_removed"));
+                }
+                catch{}
             }
         }
         context.Archive.RemoveRange(messages);
@@ -76,7 +80,7 @@ public class moderator: IBotController
         var context = new dbContext();
         var original_message = update.GetMessage();
         var user_id = long.Parse(Helping.get_data_from_string(update.CallbackQuery.Data)["user_id"]);
-        var user = context.Users.Find(user_id);
+        var user = await context.Users.FindAsync(user_id);
         if (user.Role == RoleEnum.Banned)
         {
             await client.AnswerCallbackQueryAsync(update.CallbackQuery.Id, TEXT.Get("user_already_banned"));

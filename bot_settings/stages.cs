@@ -22,7 +22,7 @@ public class InMemoryContext : DbContext
     public DbSet<StageModel> Stages { get; set; }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseInMemoryDatabase("db");
+        optionsBuilder.UseModel(InMemoryContextModel.Instance).UseInMemoryDatabase("db");
         base.OnConfiguring(optionsBuilder);
     }
 }

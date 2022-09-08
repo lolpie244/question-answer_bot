@@ -1,8 +1,6 @@
-using helping;
 using Microsoft.EntityFrameworkCore;
 using settings;
 namespace db_namespace;
-
 
 public class dbContext : DbContext
 {
@@ -16,11 +14,12 @@ public class dbContext : DbContext
     }
     public dbContext(DbContextOptions<dbContext> options) : base(options)
     {
+        
     }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseNpgsql(ConnectionString);
-        base.OnConfiguring(optionsBuilder);
+        if (!optionsBuilder.IsConfigured)
+            optionsBuilder.UseNpgsql(ConnectionString).UseModel(dbContextModel.Instance);
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

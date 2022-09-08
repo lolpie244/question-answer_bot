@@ -5,12 +5,13 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace BotSettings;
-
+[Serializable]
 public abstract class HandlerAttribute: BaseCheckAttribute
 {
     public abstract UpdateType UpdateType { get; }
     public override bool isFilter { get => false; }
 }
+[Serializable]
 public class CommandAttribute : HandlerAttribute
 {
     public string[] Commands { get; set; }
@@ -39,6 +40,7 @@ public class CommandAttribute : HandlerAttribute
     }
 }
 
+[Serializable]
 public class TextAttribute : HandlerAttribute
 {
     public override UpdateType UpdateType
@@ -69,6 +71,7 @@ public class TextAttribute : HandlerAttribute
 
 }
 
+[Serializable]
 public class InlineButtonCallbackAttribute : HandlerAttribute
 {
     public string[]? CallbackData;
@@ -92,7 +95,7 @@ public class InlineButtonCallbackAttribute : HandlerAttribute
         return false;
     }
 }
-
+[Serializable]
 public class MessageAttribute : HandlerAttribute
 {
     public MessageType[] Types;
@@ -116,7 +119,7 @@ public class MessageAttribute : HandlerAttribute
         return false;
     }
 }
-
+[Serializable]
 public class BotStatusInGroupAttribute : HandlerAttribute
 {
     public override UpdateType UpdateType

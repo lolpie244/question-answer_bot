@@ -47,7 +47,7 @@ namespace franko_bot.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Archive");
+                    b.ToTable("Archive", (string)null);
                 });
 
             modelBuilder.Entity("db_namespace.Chat", b =>
@@ -64,7 +64,7 @@ namespace franko_bot.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Chats");
+                    b.ToTable("Chats", (string)null);
                 });
 
             modelBuilder.Entity("db_namespace.User", b =>
@@ -89,7 +89,7 @@ namespace franko_bot.Migrations
 
                     b.HasIndex("UserSettingsCode");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("db_namespace.UserData", b =>
@@ -114,7 +114,7 @@ namespace franko_bot.Migrations
 
                     b.HasKey("Code");
 
-                    b.ToTable("UsersData");
+                    b.ToTable("UsersData", (string)null);
                 });
 
             modelBuilder.Entity("db_namespace.User", b =>

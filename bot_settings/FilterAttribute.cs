@@ -4,11 +4,12 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
 namespace BotSettings;
-
+[Serializable]
 public abstract class FilterAttribute: BaseCheckAttribute
 {
     public override bool isFilter { get => true; }
 }
+[Serializable]
 
 public class ScopeAttribute : FilterAttribute
 {
@@ -27,6 +28,7 @@ public class ScopeAttribute : FilterAttribute
         return true;
     }
 }
+[Serializable]
 
 public class StageAttribute : FilterAttribute
 {
@@ -43,6 +45,7 @@ public class StageAttribute : FilterAttribute
         return Stages.Length == 0 || Stages.Contains(stage);
     }   
 }
+[Serializable]
 
 public class RoleAttribute : FilterAttribute
 {
@@ -68,17 +71,17 @@ public class RoleAttribute : FilterAttribute
         db_namespace.RoleEnum role;
         using (var context = new db_namespace.dbContext())
         {
-            var user = context.Users.Find(user_id);
+            var user = context.Users.First(obj => obj.Id == user_id);
             if (user == null)
                 return false;
             role = user.Role;
         }
-
         if (Higher)
             return Roles[0] <= role;
         return Roles.Contains(role);
     }
 }
+[Serializable]
 
 public class UpdateUserAttribute : FilterAttribute
 {

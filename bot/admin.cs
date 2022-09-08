@@ -17,7 +17,7 @@ public class admin: IBotController
         var context = new dbContext();
         var user_id = long.Parse(helping.Helping.get_data_from_string(update.CallbackQuery.Data)["user_id"]);
         var user = context.Users.Find(user_id);
-        var current_user = context.Users.Find(update.GetUser().Id);
+        var current_user = update.GetDbUser();
         if (user.Role >= current_user.Role)
         {
             await client.AnswerCallbackQueryAsync(update.CallbackQuery.Id, TEXT.Get("no_permissions"));
