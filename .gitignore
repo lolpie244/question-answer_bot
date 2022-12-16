@@ -4,6 +4,6 @@
 /franko_bot/obj/
 /.terraform
 /.terraform.lock.hcl
-/.terraform.tfstate
-/.terraform.tfstate.backup
-
+/terraform.tfstate
+/terraform.tfstate.backup
+/franko_bot/.idea
