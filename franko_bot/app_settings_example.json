@@ -1,0 +1,19 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "System.Net.Http.HttpClient": "Error",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "db": {
+    "host": "database url",
+    "user": "username",
+    "database": "main database",
+    "password": "user password",
+    "port": "5432"
+  },
+  "token": "<token>",
+  "webhook": "<url>"
+}
