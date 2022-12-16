@@ -6,4 +6,4 @@
 /.terraform.lock.hcl
 /terraform.tfstate
 /terraform.tfstate.backup
-/franko_bot/.idea
+/franko_bot/.idea/*
