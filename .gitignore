@@ -1,4 +1,9 @@
-/appsettings.Development.json
-/appsettings.json
-/bin/
-/obj/
+/franko_bot/appsettings.Development.json
+/franko_bot/appsettings.json
+/franko_bot/bin/
+/franko_bot/obj/
+/.terraform
+/.terraform.lock.hcl
+/.terraform.tfstate
+/.terraform.tfstate.backup
+
