@@ -18,7 +18,7 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         SetupConfiguration.Services(services, Configuration);
-        services.AddAWSLambdaHosting(LambdaEventSource.RestApi);
+        services.AddAWSLambdaHosting(LambdaEventSource.HttpApi);
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

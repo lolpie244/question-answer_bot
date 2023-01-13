@@ -29,6 +29,7 @@ public static class SetupConfiguration
     {
         app.UseHttpsRedirection();
         app.UseRouting();
+		Console.WriteLine("IN MAPPING ENDPOINTS");
         app.UseEndpoints(endpoints =>
         {
             var token = config.Get<BotConfig>().token;
@@ -39,6 +40,7 @@ public static class SetupConfiguration
             endpoints.MapGet("/",
                 async context =>
                 {
+					Console.WriteLine("IN METHOD");
                     await context.Response.WriteAsync("Welcome to running ASP.NET Core on AWS Lambda");
                 });
         });

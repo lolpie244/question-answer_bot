@@ -22,7 +22,7 @@ public abstract class BaseCheckAttribute : Attribute
 // Interface, Which is implemented by classes with handlers
 public interface IBotController
 {
-    
+
 }
 // Main data for using handlers
 [Serializable]
@@ -110,7 +110,8 @@ public class Aspect : LocationInterceptionAspect
 public class UpdateHandlerManager
 {
     public HandlersData handlersData { get; } = new HandlersData();
-    [Aspect] public HandlersData originalHanldersData { get; }
+    [Aspect]
+    public HandlersData originalHanldersData { get; }
     public Dictionary<MethodInfo, BaseCheckDelegate> delegates = new();
 
     public UpdateHandlerManager()
