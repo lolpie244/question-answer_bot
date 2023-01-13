@@ -2,6 +2,6 @@
 /franko_bot/appsettings.json
 /franko_bot/bin/
 /franko_bot/obj/
-/.terraform
-/.terraform.lock.hcl
+/terraform/.terraform
+/terraform/.terraform.lock.hcl
 terraform.*

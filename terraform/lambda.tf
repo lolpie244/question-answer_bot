@@ -21,8 +21,8 @@ resource "aws_s3_bucket_acl" "bucket_acl" {
 data "archive_file" "lambda_franko_bot" {
   type = "zip"
 
-  source_dir  = "${path.module}/franko_bot/bin/Release/net6.0/publish" # source directory
-  output_path = "${path.module}/franko_bot/bin/Release/net6.0/franko_bot.zip" # result archive
+  source_dir  = "${path.module}/../franko_bot/bin/Release/net6.0/publish" # source directory
+  output_path = "${path.module}/../franko_bot/bin/Release/net6.0/franko_bot.zip" # result archive
 }
 
 # define aws s3 object

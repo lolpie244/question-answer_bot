@@ -11,7 +11,7 @@ variable "aws_region" {
 }
 
 variable "lambda_timeout" {
-  description = "Timeout for eu-central"
+  description = "Timeout"
   type    = number
   default = 60
   validation {
