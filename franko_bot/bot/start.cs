@@ -15,7 +15,7 @@ public class start_and_help: IBotController
     {
         await client.SendTextMessageAsync(update.GetChat().Id, TEXT.Get("help_user_message"));
     }
-    
+
     [Scope(ChatType.Group, ChatType.Supergroup)]
     public async Task Chat(ITelegramBotClient client, Update update)
     {
@@ -39,11 +39,9 @@ public class start_and_help: IBotController
         text = chat switch
         {
             { Type: ChatEnum.Answer } => TEXT.Get("help_answer_chat_message"),
-            { Type: ChatEnum.Archive } => TEXT.Get("help_chat_message"),
-            { Type: ChatEnum.Report } => TEXT.Get("help_chat_message"),
+            { Type: ChatEnum.Archive } => TEXT.Get("help_archive_message"),
+            { Type: ChatEnum.Report } => TEXT.Get("help_report_message"),
         };
         await client.SendTextMessageAsync(chat_id, text);
-            
     }
-    
 }
