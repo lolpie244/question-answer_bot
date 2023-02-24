@@ -1,7 +1,4 @@
 namespace settings;
-using Microsoft.Extensions.Configuration;
-// using System.Configuration; 
-using System;
 
 public class DbConfig
 {
