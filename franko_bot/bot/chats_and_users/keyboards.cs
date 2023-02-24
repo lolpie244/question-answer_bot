@@ -2,6 +2,7 @@ using BotSettings;
 using helping;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
+using db_namespace;
 using User = db_namespace.User;
 
 namespace Bot.UsersAndChats;
@@ -17,11 +18,13 @@ public class Keyboards
 
 	public InlineKeyboardMarkup ChatType()
 	{
-		return new(new[] {
-			new[]{InlineKeyboardButton.WithCallbackData(TEXT.Get("chats.buttons.answer"), "answer_group")},
-			new[]{InlineKeyboardButton.WithCallbackData(TEXT.Get("chats.buttons.archive"), "archive_group")},
-			new[]{InlineKeyboardButton.WithCallbackData(TEXT.Get("chats.buttons.report"), "report_group")}
-		});
+		var chat_types = new[] { ChatEnum.Answer, ChatEnum.Report, ChatEnum.Report };
+		var buttons = new InlineKeyboardButton[chat_types.Length];
+		for (int i = 0; i < chat_types.Length; i++) {
+			var type = chat_types[i];
+			buttons[i] = InlineKeyboardButton.WithCallbackData(TEXT.Get($"chats.buttons.{type.ToString().ToLower()}"), $"new_chat_type:type={(int)type}");
+		}
+		return new(buttons);
 	}
 	public InlineKeyboardMarkup Ban(User user, bool ban)
 	{
