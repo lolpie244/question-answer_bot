@@ -46,7 +46,7 @@ public class Helping
 public class TEXT
 {
 	private static Dictionary<string, JsonElement>? Text;
-	public static string Get(string name)
+	public static string Get(string name, string name_of_default = "")
 	{
 		if (Text == null) {
 			string file_path = "text.json";
@@ -57,11 +57,16 @@ public class TEXT
 		}
 
 		var names = name.Split(".");
-		JsonElement path = Text[names[0]];
-		for(int i = 1; i < names.Length; i++)
-			path = path.GetProperty(names[i]);
+		try {
 
-		return path.ToString();
+			JsonElement path = Text[names[0]];
+			for (int i = 1; i < names.Length; i++)
+				path = path.GetProperty(names[i]);
+			return path.ToString();
+
+		} catch (KeyNotFoundException) {
+			return Get(name_of_default);
+		}
 	}
 
 }

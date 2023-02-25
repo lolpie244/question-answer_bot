@@ -12,6 +12,7 @@ public class UserStart : IBotController
 	public async Task User(ITelegramBotClient client, Update update)
 	{
 		var role = update.GetDbUser()!.Role.ToString().ToLower();
-		await client.SendTextMessageAsync(update.GetChat()!.Id, TEXT.Get($"roles.help.{role}"));
+		string text = TEXT.Get($"roles.help.{role}", "roles.help.default");
+		await client.SendTextMessageAsync(update.GetChat()!.Id, text);
 	}
 }
