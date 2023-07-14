@@ -69,7 +69,7 @@ public class CloseQuestion : IBotController
 		await client.AnswerCallbackQueryAsync(update.CallbackQuery!.Id, Strings.Format(TEXT.Get("qa.question_closed"), name));
 	}
 
-	[Command("close"), Role(RoleEnum.User, true), Scope(ChatType.Private)]
+	[Command("/end"), Role(RoleEnum.User, true), Scope(ChatType.Private)]
 	public async Task user_close_question(ITelegramBotClient client, Update update)
 	{
 		await close_user_questions(client, update.GetUser().Id!);
