@@ -1,5 +1,4 @@
 using db_namespace;
-using Microsoft.EntityFrameworkCore;
 using Telegram.Bot.Types;
 using Chat = Telegram.Bot.Types.Chat;
 using User = Telegram.Bot.Types.User;
@@ -30,7 +29,7 @@ internal static class Extensions
         var context = new dbContext();
         return context.Users.Find(update.GetUser().Id);
     }
-        
+
     public static Chat? GetChat(this Update update) =>
         update switch
         {

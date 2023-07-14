@@ -1,14 +1,12 @@
 /// Need for using Dictionary in postsharp aspect
 namespace System.Collections.Generic
 {
-    
-    
     [Serializable]
     public class GenericEqualityComparer<T> : EqualityComparer<T>
     {
         public override bool Equals(T? a, T? b)
         {
-            return a.Equals(b);
+            return a!.Equals(b);
         }
 
         public override int GetHashCode(T obj)
@@ -21,7 +19,7 @@ namespace System.Collections.Generic
     {
         public override bool Equals(T? a, T? b)
         {
-            return a.Equals(b);
+            return a!.Equals(b);
         }
 
         public override int GetHashCode(T obj)
@@ -34,7 +32,7 @@ namespace System.Collections.Generic
     {
         public override bool Equals(T? a, T? b)
         {
-            return a.Equals(b);
+            return a!.Equals(b);
         }
 
         public override int GetHashCode(T obj)

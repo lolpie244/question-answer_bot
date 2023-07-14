@@ -71,7 +71,7 @@ public class RoleAttribute : FilterAttribute
         db_namespace.RoleEnum role;
         using (var context = new db_namespace.dbContext())
         {
-            var user = context.Users.First(obj => obj.Id == user_id);
+            var user = context.Users.FirstOrDefault(obj => obj.Id == user_id);
             if (user == null)
                 return false;
             role = user.Role;
