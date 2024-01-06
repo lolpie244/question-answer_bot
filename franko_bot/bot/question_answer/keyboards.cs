@@ -30,12 +30,10 @@ public class Keyboards
 	}
 
 
-	public InlineKeyboardMarkup History(Archive message, User? user = null)
+	public InlineKeyboardMarkup History(Archive message)
 	{
-		if (user == null) {
-			var context = new dbContext();
-			user = context.Users.Find(message.UserId);
-		}
+		var context = new dbContext();
+		var user = context.Users.Find(message.UserId);
 
 		if (message.IsQuestion)
 			return new(new[] {
@@ -68,4 +66,15 @@ public class Keyboards
 			}
 		});
 	}
+	public InlineKeyboardMarkup HistoryStart(User user) {
+		return new(new[] {
+			new[]{
+				InlineKeyboardButton.WithUrl(
+				    string.Format(TEXT.Get("chats.new_conversation_in_archive_button"), user!.Name),
+				    $"tg://user?id={user.Id}"
+				)
+			}
+		});
+	}
+
 }

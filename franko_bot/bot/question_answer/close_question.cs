@@ -11,7 +11,7 @@ namespace Bot.QA;
 
 public class CloseQuestion : IBotController
 {
-	private async Task<string> close_user_questions(ITelegramBotClient client, long asker_id)
+	private async Task<string> close_user_questions(ITelegramBotClient client, long asker_id, db_namespace.User closed_by)
 	{
 		var context = new dbContext();
 		var chats = context.Chats.Where(obj => obj.Type == ChatEnum.Archive).ToArray();
@@ -24,14 +24,15 @@ public class CloseQuestion : IBotController
 
 		foreach (var chat in chats) {
 			await client.SendTextMessageAsync(
-			    chat.Id, String.Format(TEXT.Get("chats.new_conversation_in_archive"), closed_at)
+			    chat.Id, String.Format(TEXT.Get("chats.new_conversation_in_archive"), closed_at),
+				replyMarkup: keyboard.HistoryStart(closed_by)
 			);
 			foreach (var message in messages)
 				try {
-					await client.CopyMessageAsync(chat.Id, message.ChatId, message.MessageId, replyMarkup: keyboard.History(message, asker));
+					await client.CopyMessageAsync(chat.Id, message.ChatId, message.MessageId, replyMarkup: keyboard.History(message));
 				} catch (Exception) {
 					await client.SendTextMessageAsync(
-					    chat.Id, TEXT.Get("other.deleted_message"), replyMarkup: keyboard.History(message, asker)
+					    chat.Id, TEXT.Get("other.deleted_message"), replyMarkup: keyboard.History(message)
 					);
 				}
 		}
@@ -62,16 +63,17 @@ public class CloseQuestion : IBotController
 		                   obj.MessageId == message.MessageId &&
 		                   obj.ChatId == message.Chat.Id
 		               ).RelatedUserId;
+		var close_by = update.GetUser();
 
 		if (asker_id == null)
 			return;
-		var name = await close_user_questions(client, (long)asker_id);
+		var name = await close_user_questions(client, (long)asker_id, update.GetDbUser());
 		await client.AnswerCallbackQueryAsync(update.CallbackQuery!.Id, Strings.Format(TEXT.Get("qa.question_closed"), name));
 	}
 
 	[Command("/end"), Role(RoleEnum.User, true), Scope(ChatType.Private)]
 	public async Task user_close_question(ITelegramBotClient client, Update update)
 	{
-		await close_user_questions(client, update.GetUser().Id!);
+		await close_user_questions(client, update.GetUser().Id!, update.GetDbUser());
 	}
 }
