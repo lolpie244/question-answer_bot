@@ -1,0 +1,18 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:14-alpine
+    ports:
+      - 5432:5432
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+      - ./backup.sql:/docker-entrypoint-initdb.d/create_database.sql
+    environment:
+      - POSTGRES_PASSWORD=really_secret_password
+      - POSTGRES_USER=nzerrnpq
+      - POSTGRES_DB=franko_bot_bd
+  bot:
+    build: .
+    ports:
+      - "59890:59890"
